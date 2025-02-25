@@ -19,6 +19,7 @@ class _NotificationPageState extends State<NotificationPage> {
   void _listenForNotifications() {
     FirebaseFirestore.instance
         .collection('notifications')
+        .where('isRead', isEqualTo: false) // Solo cuenta las no leídas
         .snapshots()
         .listen((snapshot) {
       setState(() {
@@ -29,6 +30,18 @@ class _NotificationPageState extends State<NotificationPage> {
 
   void _deleteNotification(String docId) {
     FirebaseFirestore.instance.collection('notifications').doc(docId).delete();
+  }
+
+  void _markNotificationsAsRead() {
+    FirebaseFirestore.instance.collection('notifications').get().then((snapshot) {
+      for (var doc in snapshot.docs) {
+        doc.reference.update({'isRead': true});
+      }
+    });
+
+    setState(() {
+      _notificationCount = 0;
+    });
   }
 
   void _showNotificationsModal() {
@@ -68,6 +81,11 @@ class _NotificationPageState extends State<NotificationPage> {
                       leading: Icon(Icons.notifications_active, color: Colors.blueAccent),
                       title: Text(doc['message']),
                       subtitle: Text(doc['timestamp']?.toDate().toString() ?? ""),
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(doc['message'])),
+                        );
+                      },
                     ),
                   );
                 }).toList(),
@@ -76,7 +94,7 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         );
       },
-    );
+    ).whenComplete(() => _markNotificationsAsRead()); // Marcar notificaciones como leídas
   }
 
   @override
@@ -93,8 +111,8 @@ class _NotificationPageState extends State<NotificationPage> {
                 Icon(Icons.notifications, size: 32),
                 if (_notificationCount > 0)
                   Positioned(
-                    right: 0,
-                    top: 0,
+                    right: -5,
+                    top: -5,
                     child: Container(
                       padding: EdgeInsets.all(4),
                       decoration: BoxDecoration(
@@ -139,8 +157,3 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 }
-
-
-
-
-
