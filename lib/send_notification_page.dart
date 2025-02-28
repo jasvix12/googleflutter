@@ -11,15 +11,31 @@ class _SendNotificationPageState extends State<SendNotificationPage> {
   final TextEditingController _messageController = TextEditingController();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
+  @override
+  void initState() {
+    super.initState();
+    _getDeviceToken();
+  }
+
+  Future<void> _getDeviceToken() async {
+    String? token = await _firebaseMessaging.getToken();
+    if (token != null) {
+      await FirebaseFirestore.instance.collection('tokens').doc(token).set({
+        'token': token,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
   Future<void> _sendNotification() async {
     String message = _messageController.text.trim();
     if (message.isEmpty) return;
 
-    // Guardar notificación en Firestore
+    
     await FirebaseFirestore.instance.collection('notifications').add({
       'message': message,
       'timestamp': FieldValue.serverTimestamp(),
-      'read': false, // Nuevo campo para manejar el estado de lectura
+      'read': false,
     });
 
     // Enviar notificación push con Firebase Cloud Messaging

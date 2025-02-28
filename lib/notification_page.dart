@@ -19,7 +19,7 @@ class _NotificationPageState extends State<NotificationPage> {
   void _listenForNotifications() {
     FirebaseFirestore.instance
         .collection('notifications')
-        .where('isRead', isEqualTo: false) // Solo cuenta las no leídas
+        .where('read', isEqualTo: false) // Solo cuenta las no leídas
         .snapshots()
         .listen((snapshot) {
       setState(() {
