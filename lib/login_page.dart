@@ -35,17 +35,15 @@ class _LoginPageState extends State<LoginPage> {
         final UserCredential userCredential =
             await FirebaseAuth.instance.signInWithCredential(credential);
 
-// Dentro de signIn()
-if (userCredential.user != null) {
-  // Redirige a la página de notificaciones después de iniciar sesión
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (context) => NotificationPage(), // Redirige a NotificationPage
-    ),
-  );
-}
-
+        if (userCredential.user != null) {
+          // Redirige a la página de notificaciones después de iniciar sesión
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NotificationPage(), // Redirige a NotificationPage
+            ),
+          );
+        }
       }
     } catch (error) {
       print('Error de inicio de sesión: $error');

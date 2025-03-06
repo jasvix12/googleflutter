@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'send_notification_page.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 class NotificationPage extends StatefulWidget {
   @override
@@ -25,23 +29,59 @@ class _NotificationPageState extends State<NotificationPage> {
       setState(() {
         _notificationCount = snapshot.docs.length;
       });
+
+      // Muestra una notificación local por cada nueva solicitud
+      for (var doc in snapshot.docs) {
+        String message = doc['message'];
+        _showLocalNotification("Nueva solicitud", message);
+      }
     });
+  }
+
+  Future<void> _showLocalNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'your_channel_id',
+      'your_channel_name',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+    );
   }
 
   void _deleteNotification(String docId) {
-    FirebaseFirestore.instance.collection('notifications').doc(docId).delete();
+    try {
+      FirebaseFirestore.instance.collection('notifications').doc(docId).delete().then((_) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Notificación eliminada')));
+      });
+    } catch (e) {
+      print('Error al eliminar notificación: $e');
+    }
   }
 
   void _markNotificationsAsRead() {
-    FirebaseFirestore.instance.collection('notifications').get().then((snapshot) {
-      for (var doc in snapshot.docs) {
-        doc.reference.update({'isRead': true});
-      }
-    });
-
-    setState(() {
-      _notificationCount = 0;
-    });
+    try {
+      FirebaseFirestore.instance.collection('notifications').get().then((snapshot) {
+        for (var doc in snapshot.docs) {
+          doc.reference.update({'read': true});
+        }
+      }).then((_) {
+        setState(() {
+          _notificationCount = 0;
+        });
+      });
+    } catch (e) {
+      print('Error al marcar notificaciones como leídas: $e');
+    }
   }
 
   void _showNotificationsModal() {
