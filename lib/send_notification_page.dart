@@ -50,8 +50,10 @@ class _SendNotificationPageState extends State<SendNotificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:Colors.yellow[100], //Fondo amarillo claro
       appBar: AppBar(
         title: Text("Enviar Notificación"),
+        backgroundColor: Colors.yellow[700], //AppBar amarillo mas oscuro
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -67,6 +69,10 @@ class _SendNotificationPageState extends State<SendNotificationPage> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _sendNotification,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.yellow[700], //Boton amarillo oscuro
+                foregroundColor: Colors.white, //Texto blanco
+              ),
               child: Text("Enviar Notificación"),
             ),
           ],

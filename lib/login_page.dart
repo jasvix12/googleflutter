@@ -50,22 +50,15 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Función para cerrar sesión
-  Future<void> signOut() async {
-    await GoogleSignInApi.signOut();
-    await FirebaseAuth.instance.signOut(); // Cierra la sesión de Firebase
-    setState(() {
-      _user = null;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Login with Google"),
       ),
-      body: Center(
+      body: Container(// Agregamos un Container para el fondo
+      color:Colors.yellow, //Establecemos el color de fonfo a amarillo
+      child: Center(
         child: _user == null
             ? ElevatedButton.icon(
                 icon: const FaIcon(
@@ -83,12 +76,10 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('Bienvenido, ${_user!.displayName}'),
-                  ElevatedButton(
-                    onPressed: signOut,
-                    child: const Text("Cerrar sesión"),
-                  ),
+                
                 ],
               ),
+      ),
       ),
     );
   }
