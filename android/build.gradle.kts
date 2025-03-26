@@ -1,5 +1,4 @@
 buildscript {
-    
     repositories {    // O la versión más reciente
     google()
     mavenCentral()

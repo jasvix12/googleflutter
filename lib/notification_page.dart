@@ -7,6 +7,10 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 class NotificationPage extends StatefulWidget {
+  final String? userPhotoUrl; // Recibir la URL de la foto de perfil
+
+  NotificationPage({this.userPhotoUrl});
+
   @override
   _NotificationPageState createState() => _NotificationPageState();
 }
@@ -142,7 +146,17 @@ class _NotificationPageState extends State<NotificationPage> {
     return Scaffold(
       backgroundColor: Colors.yellow[100],
       appBar: AppBar(
-        title: Text("Notificaciones"),
+        title: Row(
+          children: [
+            if (widget.userPhotoUrl != null)
+              CircleAvatar(
+                backgroundImage: NetworkImage(widget.userPhotoUrl!),
+                radius: 15,
+              ),
+            SizedBox(width: 10),
+            Text("Notificaciones"),
+          ],
+        ),
         backgroundColor: Colors.yellow[700],
         actions: [
           IconButton(
@@ -170,9 +184,9 @@ class _NotificationPageState extends State<NotificationPage> {
                           fontSize: 10,
                         ),
                         textAlign: TextAlign.center,
-                      ),
                     ),
                   ),
+                ),
               ],
             ),
             onPressed: _showNotificationsModal,

@@ -40,7 +40,9 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => NotificationPage(), // Redirige a NotificationPage
+              builder: (context) => NotificationPage(
+                userPhotoUrl: _user!.photoUrl, // Pasar la URL de la foto de perfil
+              ),
             ),
           );
         }
@@ -56,30 +58,29 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: const Text("Login with Google"),
       ),
-      body: Container(// Agregamos un Container para el fondo
-      color:Colors.yellow, //Establecemos el color de fonfo a amarillo
-      child: Center(
-        child: _user == null
-            ? ElevatedButton.icon(
-                icon: const FaIcon(
-                  size: 40.0,
-                  FontAwesomeIcons.google,
-                  color: Colors.green,
+      body: Container(
+        color: Colors.yellow, // Establecemos el color de fondo a amarillo
+        child: Center(
+          child: _user == null
+              ? ElevatedButton.icon(
+                  icon: const FaIcon(
+                    size: 40.0,
+                    FontAwesomeIcons.google,
+                    color: Colors.green,
+                  ),
+                  onPressed: signIn,
+                  label: const Text(
+                    "Login With Google",
+                    style: TextStyle(fontSize: 20.0, color: Colors.blue),
+                  ),
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Bienvenido, ${_user!.displayName}'),
+                  ],
                 ),
-                onPressed: signIn,
-                label: const Text(
-                  "Login With Google",
-                  style: TextStyle(fontSize: 20.0, color: Colors.blue),
-                ),
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Bienvenido, ${_user!.displayName}'),
-                
-                ],
-              ),
-      ),
+        ),
       ),
     );
   }
