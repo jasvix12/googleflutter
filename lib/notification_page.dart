@@ -7,9 +7,16 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 class NotificationPage extends StatefulWidget {
-  final String? userPhotoUrl; // Recibir la URL de la foto de perfil
+  final String? userPhotoUrl;
+  final String? userName;
+  final String? userEmail;
 
-  NotificationPage({this.userPhotoUrl});
+  const NotificationPage({
+    Key? key,
+    this.userPhotoUrl,
+    this.userName,
+    this.userEmail,
+  }) : super(key: key);
 
   @override
   _NotificationPageState createState() => _NotificationPageState();
@@ -27,14 +34,13 @@ class _NotificationPageState extends State<NotificationPage> {
   void _listenForNotifications() {
     FirebaseFirestore.instance
         .collection('notifications')
-        .where('read', isEqualTo: false) // Solo cuenta las no leídas
+        .where('read', isEqualTo: false)
         .snapshots()
         .listen((snapshot) {
       setState(() {
         _notificationCount = snapshot.docs.length;
       });
 
-      // Muestra una notificación local por cada nueva solicitud
       for (var doc in snapshot.docs) {
         String message = doc['message'];
         _showLocalNotification("Nueva solicitud", message);
@@ -138,7 +144,37 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         );
       },
-    ).whenComplete(() => _markNotificationsAsRead()); // Marcar notificaciones como leídas
+    ).whenComplete(() => _markNotificationsAsRead());
+  }
+
+  void _showProfileInfo(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.userName != null)
+              Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text(widget.userName!),
+              ),
+            if (widget.userEmail != null)
+              Text(
+                widget.userEmail!,
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cerrar"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -149,9 +185,12 @@ class _NotificationPageState extends State<NotificationPage> {
         title: Row(
           children: [
             if (widget.userPhotoUrl != null)
-              CircleAvatar(
-                backgroundImage: NetworkImage(widget.userPhotoUrl!),
-                radius: 15,
+              GestureDetector(
+                onTap: () => _showProfileInfo(context),
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(widget.userPhotoUrl!),
+                  radius: 15,
+                ),
               ),
             SizedBox(width: 10),
             Text("Notificaciones"),
@@ -184,9 +223,9 @@ class _NotificationPageState extends State<NotificationPage> {
                           fontSize: 10,
                         ),
                         textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
             onPressed: _showNotificationsModal,
