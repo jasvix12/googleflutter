@@ -29,6 +29,11 @@ class _NotificationPageState extends State<NotificationPage> {
   void initState() {
     super.initState();
     _listenForNotifications();
+    _debugPrintUserData();
+  }
+
+  void _debugPrintUserData() {
+
   }
 
   void _listenForNotifications() {
@@ -148,6 +153,12 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   void _showProfileInfo(BuildContext context) {
+    final name = widget.userName?.isNotEmpty == true
+    ? widget.userName!:'No se pude obtener el nombre';
+
+    final email = widget.userEmail?.isNotEmpty == true
+    ? widget.userEmail!:'Correo no disponible';
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

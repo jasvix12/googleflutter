@@ -41,7 +41,9 @@ class _LoginPageState extends State<LoginPage> {
             context,
             MaterialPageRoute(
               builder: (context) => NotificationPage(
-                userPhotoUrl: _user!.photoUrl, // Pasar la URL de la foto de perfil
+                userPhotoUrl: _user!.photoUrl ?? '', // Pasar la URL de la foto de perfil
+                userName: _user?.displayName ?? '', //Nombre del usuario
+                userEmail: _user?.email ?? '', //Email del usuario
               ),
             ),
           );
