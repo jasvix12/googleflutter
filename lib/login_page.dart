@@ -5,6 +5,7 @@ import 'google_sign_in_api.dart'; // Asegúrate de importar la clase
 import 'notification_page.dart'; // Asegúrate de importar la nueva página
 import 'package:firebase_auth/firebase_auth.dart'; // Importa FirebaseAuth
 
+
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -12,9 +13,14 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   GoogleSignInAccount? _user;
+  bool _isLoading = false;
 
   // Función para iniciar sesión
   Future<void> signIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       // Inicia sesión con Google
       final usuario = await GoogleSignInApi.login();
@@ -51,6 +57,15 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (error) {
       print('Error de inicio de sesión: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al iniciar sesion: $error')),
+      );
+    }finally {
+      if(mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 

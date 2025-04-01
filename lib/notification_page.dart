@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'send_notification_page.dart';
+import 'login_page.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -25,12 +28,14 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   int _notificationCount = 0;
 
+
   @override
   void initState() {
     super.initState();
     _listenForNotifications();
     _debugPrintUserData();
   }
+
 
   void _debugPrintUserData() {
 
@@ -151,7 +156,29 @@ class _NotificationPageState extends State<NotificationPage> {
       },
     ).whenComplete(() => _markNotificationsAsRead());
   }
+ // Añade este método para cerrar sesión
+  Future<void> _signOut() async {
+    try {
+      // Cerrar sesión en Firebase
+      await FirebaseAuth.instance.signOut();
+      
+      // Cerrar sesión en Google
+      await GoogleSignIn().signOut();
+      
+      // Navegar de vuelta a la página de login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } catch (e) {
+      print('Error al cerrar sesión: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cerrar sesión')),
+      );
+    }
+  }
 
+//Modifica el metodo _showProfileInfo para incluir el boton de cerrar sesion
   void _showProfileInfo(BuildContext context) {
     final name = widget.userName?.isNotEmpty == true
     ? widget.userName!:'No se pude obtener el nombre';
@@ -183,6 +210,13 @@ class _NotificationPageState extends State<NotificationPage> {
             onPressed: () => Navigator.pop(context),
             child: Text("Cerrar"),
           ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); //Cierra el dialogo primero
+              _signOut(); //Luego cierra sesion
+            },
+            child: Text("Cerrar sesion", style: TextStyle(color:Colors.red)),
+          )
         ],
       ),
     );
